@@ -1,32 +1,22 @@
 import React from 'react';
-import { Grid, Paper, Typography } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { Typography, Container, Box, Paper } from '@mui/material';
 
-const Item = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(2),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
-
-const Home = () => {
+const Dashboard = () => {
+  // Here you can add real data fetching & visualization logic
   return (
-    <div>
-      <Typography variant="h4" gutterBottom>
-        Welcome to Church Dashboard
-      </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6} lg={4}>
-          <Item>Upcoming Events</Item>
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <Item>Recent Sermons</Item>
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
-          <Item>Donation Summary</Item>
-        </Grid>
-      </Grid>
-    </div>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom>Dashboard</Typography>
+      <Paper sx={{ padding: 3 }}>
+        <Typography>Welcome to the Church Member Dashboard!</Typography>
+        {/* Add stats, charts, summaries here */}
+        <Box mt={2}>
+          {/* Example: total members count, recent additions, etc. */}
+          <Typography variant="h6">Total Members: 120</Typography>
+          <Typography variant="h6">New Members This Month: 5</Typography>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 
-export default Home;
+export default Dashboard;
