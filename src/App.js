@@ -6,9 +6,9 @@ import { AuthProvider } from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
 
 // Auth pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
+import Login from './pages/login';
+import Register from './pages/register';
+import ForgotPassword from './pages/forgotPassword';
 
 // Layout components
 import Sidebar from './components/Sidebar';
@@ -20,7 +20,7 @@ import Events from './pages/Events';
 import Sermons from './pages/Sermons';
 import Donations from './pages/Donations';
 import Members from './pages/Members';
-import MemberList from './pages/MemberList';
+import Addmember from './pages/Addmember';
 
 const AppLayout = ({ children }) => (
   <Box sx={{ display: 'flex' }}>
@@ -43,7 +43,7 @@ const App = () => {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
 
           {/* Protected Routes with Layout */}
           <Route
@@ -97,11 +97,11 @@ const App = () => {
             }
           />
           <Route
-            path="/member-list"
+            path="/Addmembers"
             element={
               <ProtectedRoute>
                 <AppLayout>
-                  <MemberList />
+                  <Addmember />
                 </AppLayout>
               </ProtectedRoute>
             }

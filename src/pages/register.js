@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import {
-  Container, TextField, Button, Typography, Box, Alert, CircularProgress, Paper,
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  CircularProgress,
+  Paper,
 } from '@mui/material';
-import { useAuth } from '../auth/AuthProvider';
+import { supabase } from '../supabase'; // <-- import your Supabase client
 import { Link, useNavigate } from 'react-router-dom';
 
 const Register = () => {
-  const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -18,24 +24,34 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
+
     setLoading(true);
-    const { error } = await signUp(email, password);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
     if (error) {
       setError(error.message);
     } else {
+      alert('Registration successful! Please check your email to verify your account.');
       navigate('/login');
     }
+
     setLoading(false);
   };
 
   return (
     <Container maxWidth="xs">
       <Paper sx={{ padding: 4, mt: 10 }}>
-        <Typography variant="h5" align="center" gutterBottom>Register</Typography>
+        <Typography variant="h5" align="center" gutterBottom>
+          Register
+        </Typography>
         <form onSubmit={handleRegister}>
           <TextField
             label="Email"
@@ -65,7 +81,11 @@ const Register = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
 
-          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
 
           <Box mt={2}>
             <Button type="submit" variant="contained" fullWidth disabled={loading}>

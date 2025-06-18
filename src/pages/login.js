@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import {
   Container, TextField, Button, Typography, Box, Alert, CircularProgress, Paper,
 } from '@mui/material';
-import { useAuth } from '../auth/AuthProvider';
+import { supabase } from '../supabase'; // import your Supabase client
 import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -19,19 +18,26 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     if (error) {
       setError(error.message);
     } else {
-      navigate('/dashboard');
+      navigate('/'); // Redirect to home page after login
     }
+
     setLoading(false);
   };
 
   return (
     <Container maxWidth="xs">
       <Paper sx={{ padding: 4, mt: 10 }}>
-        <Typography variant="h5" align="center" gutterBottom>Login</Typography>
+        <Typography variant="h5" align="center" gutterBottom>
+          Login
+        </Typography>
         <form onSubmit={handleLogin}>
           <TextField
             label="Email"
@@ -52,7 +58,11 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
 
           <Box mt={2}>
             <Button type="submit" variant="contained" fullWidth disabled={loading}>
@@ -65,7 +75,7 @@ const Login = () => {
               <Link to="/forgot-password">Forgot Password?</Link>
             </Typography>
             <Typography variant="body2" mt={1}>
-              Don't have an account? <Link to="/register">Register</Link>
+              Don&apos;t have an account? <Link to="/register">Register</Link>
             </Typography>
           </Box>
         </form>
