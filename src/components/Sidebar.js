@@ -23,6 +23,10 @@ const Sidebar = () => {
           <ListItemIcon><AttachMoney /></ListItemIcon>
           <ListItemText primary="Donations" />
         </ListItem>
+        <ListItem button component={Link} to="/Addmembers">
+          <ListItemIcon><People /></ListItemIcon>
+          <ListItemText primary="Add members" />
+        </ListItem>
         <ListItem button component={Link} to="/members">
           <ListItemIcon><People /></ListItemIcon>
           <ListItemText primary="Members" />
