@@ -45,7 +45,7 @@ const StatBox = ({ title, subtitle, icon, progress, increase }) => {
           <Box
             height="100%"
             borderRadius="4px"
-            backgroundColor={colors.blueAccent?.[500] || "#2196F3"}
+            backgroundColor={colors.blueAccent?.[500] || "#1565C0"}
             width={`${progress * 100}%`}
           ></Box>
         </Box>
