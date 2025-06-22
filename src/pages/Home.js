@@ -145,7 +145,7 @@ const Home = () => {
         {[
           { title: "Attendance Progress", progress: 0.82, description: "82% Weekly Average", subtext: "Current month attendance" },
           { title: "Giving Summary", progress: 0.65, description: "65% Monthly Target", subtext: "Current giving progress" },
-          { title: "Volunteer Participation", progress: 0.45, description: "45% Participation", subtext: "Members actively volunteering" },
+          { title: "Volunteering", progress: 0.45, description: "45% Participation", subtext: "Members actively volunteering" },
         ].map((item, index) => (
           <Box
             key={index}
