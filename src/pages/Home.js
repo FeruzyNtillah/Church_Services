@@ -33,10 +33,18 @@ import ProgressCircle from '../components/ProgressCircle';
 
 // Sample data
 const parishes = [
-  { id: 1, name: "St. Mary's Cathedral" },
-  { id: 2, name: "Sacred Heart Parish" },
-  { id: 3, name: "Our Lady of Guadalupe" }
+  { id: 1, name: "Parokia ya Bikira Maria Mama wa Rozari Takatifu - Makongo Juu" },
+  { id: 2, name: "Parokia ya Mt. Petro - Oysterbay" },
+  { id: 3, name: "Parokia ya Mt. Martin wa Porres - Mwananyamala" },
+  { id: 4, name: "Parokia ya Mt. Anna - Hananasif" },
+  { id: 5, name: "Parokia ya Mt. Kolbe - Kijitonyama" },
+  { id: 6, name: "Parokia ya Mt. Martha - Mikocheni" },
+  { id: 7, name: "Parokia ya Bikira Maria Mama wa Huruma - Mbezi Beach (Mt. Gaspar)" },
+  { id: 8, name: "Parokia ya Mt. Michael - Kawe" },
+  { id: 9, name: "Parokia ya Bikira Maria Mama wa Mwokozi - Sinza" },
+  { id: 10, name: "Parokia ya Mt. Petro - Chuo Kikuu (St. Augustine)" }
 ];
+
 
 const Home = () => {
   const theme = useTheme();
