@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CssBaseline, Container, Box } from '@mui/material';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import theme from './theme'; // Make sure this path is correct to your theme.js file
 
 import { AuthProvider } from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -36,82 +38,86 @@ const AppLayout = ({ children }) => (
 
 const App = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <CssBaseline />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
+          <Router>
+            <CssBaseline />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgotPassword" element={<ForgotPassword />} />
 
-          {/* Protected Routes with Layout */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Home />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/events"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Events />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/sermons"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Sermons />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/donations"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Donations />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/members"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Members />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/Addmembers"
-            element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Addmember />
-                </AppLayout>
-              </ProtectedRoute>
-            }
-          />
+              {/* Protected Routes with Layout */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Home />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Events />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/sermons"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Sermons />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/donations"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Donations />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/members"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Members />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/Addmembers"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Addmember />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Fallback to login */}
-          <Route path="*" element={<Login />} />
-        </Routes>
-      </Router>
-    </AuthProvider>
+              {/* Fallback to login */}
+              <Route path="*" element={<Login />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
   );
 };
 

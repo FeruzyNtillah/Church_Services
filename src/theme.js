@@ -2,13 +2,13 @@ import { createTheme } from "@mui/material/styles";
 
 export const tokens = (mode = "light") => ({
   primary: {
-    400: "#355F5F", // Darkest Teal
-    500: "#4A7E73", // Darker Teal
+    400: "#355F5F", // Darkest Teal (hover/dark)
+    500: "#4A7E7E", // Darker Teal
     700: "#5F9E9E", // Primary Teal
   },
   blueAccent: {
     500: "#355F5F", // Darkest Teal
-    600: "#4A7E73", // Darker Teal
+    600: "#4A7E7E", // Darker Teal
   },
   grey: {
     100: "#FFFFFF", // White
@@ -21,10 +21,12 @@ const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1976D2",
+      main: "#5F9E9E", // Primary muted teal
+      dark: "#355F5F", // Darkest teal (hover/active)
+      light: "#8FBDBD", // Light teal (optional)
     },
     secondary: {
-      main: "#F5F5F5",
+      main: "#F5F5F5", // Light grey
     },
     background: {
       default: "#FFFFFF",
@@ -33,6 +35,10 @@ const theme = createTheme({
     text: {
       primary: "#212121",
       secondary: "#757575",
+    },
+    action: {
+      hover: "#F5F5F5", // Light grey hover (subtle)
+      selected: "#E0F2F1", // Very light teal for selected state
     },
   },
   typography: {
