@@ -8,14 +8,16 @@ import {
   Divider,
   Switch,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Box
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Box } from '@mui/material';
 
 // Validation schema
 const validationSchema = yup.object({
@@ -123,163 +125,165 @@ export default function MemberForm() {
   }, [formik, id, isEdit]);
 
   return (
-    <Box component="form" onSubmit={formik.handleSubmit} sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        {isEdit ? 'Edit Member' : 'Add New Member'}
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box component="form" onSubmit={formik.handleSubmit} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          {isEdit ? 'Edit Member' : 'Add New Member'}
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }}>
+            {error}
+          </Alert>
+        )}
 
-      <Stack spacing={3}>
-        {/* Name Section */}
-        <Typography variant="subtitle1">Personal Information</Typography>
-        <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
-          <TextField
-            fullWidth
-            label="First Name *"
-            name="first_name"
-            value={formik.values.first_name}
-            onChange={formik.handleChange}
-            error={formik.touched.first_name && Boolean(formik.errors.first_name)}
-            helperText={formik.touched.first_name && formik.errors.first_name}
-            disabled={loading}
-          />
-          <TextField
-            fullWidth
-            label="Middle Name"
-            name="middle_name"
-            value={formik.values.middle_name}
-            onChange={formik.handleChange}
-            disabled={loading}
-          />
-          <TextField
-            fullWidth
-            label="Last Name *"
-            name="last_name"
-            value={formik.values.last_name}
-            onChange={formik.handleChange}
-            error={formik.touched.last_name && Boolean(formik.errors.last_name)}
-            helperText={formik.touched.last_name && formik.errors.last_name}
-            disabled={loading}
-          />
-        </Stack>
+        <Stack spacing={3}>
+          {/* Name Section */}
+          <Typography variant="subtitle1">Personal Information</Typography>
+          <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+            <TextField
+              fullWidth
+              label="First Name *"
+              name="first_name"
+              value={formik.values.first_name}
+              onChange={formik.handleChange}
+              error={formik.touched.first_name && Boolean(formik.errors.first_name)}
+              helperText={formik.touched.first_name && formik.errors.first_name}
+              disabled={loading}
+            />
+            <TextField
+              fullWidth
+              label="Middle Name"
+              name="middle_name"
+              value={formik.values.middle_name}
+              onChange={formik.handleChange}
+              disabled={loading}
+            />
+            <TextField
+              fullWidth
+              label="Last Name *"
+              name="last_name"
+              value={formik.values.last_name}
+              onChange={formik.handleChange}
+              error={formik.touched.last_name && Boolean(formik.errors.last_name)}
+              helperText={formik.touched.last_name && formik.errors.last_name}
+              disabled={loading}
+            />
+          </Stack>
 
-        {/* Date Fields */}
-        <DatePicker
-          label="Date of Birth *"
-          value={formik.values.date_of_birth}
-          onChange={(date) => formik.setFieldValue('date_of_birth', date)}
-          disabled={loading}
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              error: formik.touched.date_of_birth && Boolean(formik.errors.date_of_birth),
-              helperText: formik.touched.date_of_birth && formik.errors.date_of_birth,
-            },
-          }}
-        />
-
-        <Typography variant="subtitle1">Sacramental Records</Typography>
-        <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+          {/* Date Fields */}
           <DatePicker
-            label="Baptism Date"
-            value={formik.values.baptism_date}
-            onChange={(date) => formik.setFieldValue('baptism_date', date)}
+            label="Date of Birth *"
+            value={formik.values.date_of_birth}
+            onChange={(date) => formik.setFieldValue('date_of_birth', date)}
             disabled={loading}
-            sx={{ minWidth: 200 }}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                error: formik.touched.date_of_birth && Boolean(formik.errors.date_of_birth),
+                helperText: formik.touched.date_of_birth && formik.errors.date_of_birth,
+              },
+            }}
           />
-          <DatePicker
-            label="First Communion"
-            value={formik.values.communion_date}
-            onChange={(date) => formik.setFieldValue('communion_date', date)}
-            disabled={loading}
-            sx={{ minWidth: 200 }}
-          />
-          <DatePicker
-            label="Confirmation"
-            value={formik.values.confirmation_date}
-            onChange={(date) => formik.setFieldValue('confirmation_date', date)}
-            disabled={loading}
-            sx={{ minWidth: 200 }}
-          />
-        </Stack>
 
-        {/* Marriage Field */}
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Typography>Married:</Typography>
-          <Switch
-            checked={formik.values.is_married}
-            onChange={(e) => formik.setFieldValue('is_married', e.target.checked)}
-            disabled={loading}
-          />
-          {formik.values.is_married && (
+          <Typography variant="subtitle1">Sacramental Records</Typography>
+          <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
             <DatePicker
-              label="Marriage Date *"
-              value={formik.values.marriage_date}
-              onChange={(date) => formik.setFieldValue('marriage_date', date)}
+              label="Baptism Date"
+              value={formik.values.baptism_date}
+              onChange={(date) => formik.setFieldValue('baptism_date', date)}
               disabled={loading}
               sx={{ minWidth: 200 }}
-              slotProps={{
-                textField: {
-                  error: formik.touched.marriage_date && Boolean(formik.errors.marriage_date),
-                  helperText: formik.touched.marriage_date && formik.errors.marriage_date,
-                },
-              }}
             />
-          )}
-        </Stack>
+            <DatePicker
+              label="First Communion"
+              value={formik.values.communion_date}
+              onChange={(date) => formik.setFieldValue('communion_date', date)}
+              disabled={loading}
+              sx={{ minWidth: 200 }}
+            />
+            <DatePicker
+              label="Confirmation"
+              value={formik.values.confirmation_date}
+              onChange={(date) => formik.setFieldValue('confirmation_date', date)}
+              disabled={loading}
+              sx={{ minWidth: 200 }}
+            />
+          </Stack>
 
-        {/* Parish & Jummuiya */}
-        <TextField
-          select
-          label="Parish *"
-          name="parish"
-          value={formik.values.parish}
-          onChange={formik.handleChange}
-          error={formik.touched.parish && Boolean(formik.errors.parish)}
-          helperText={formik.touched.parish && formik.errors.parish}
-          disabled={loading}
-        >
-          {['St. Mary', 'Sacred Heart', 'Our Lady of Guadalupe'].map((option) => (
-            <MenuItem key={option} value={option}>
-              {option}
-            </MenuItem>
-          ))}
-        </TextField>
+          {/* Marriage Field */}
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Typography>Married:</Typography>
+            <Switch
+              checked={formik.values.is_married}
+              onChange={(e) => formik.setFieldValue('is_married', e.target.checked)}
+              disabled={loading}
+            />
+            {formik.values.is_married && (
+              <DatePicker
+                label="Marriage Date *"
+                value={formik.values.marriage_date}
+                onChange={(date) => formik.setFieldValue('marriage_date', date)}
+                disabled={loading}
+                sx={{ minWidth: 200 }}
+                slotProps={{
+                  textField: {
+                    error: formik.touched.marriage_date && Boolean(formik.errors.marriage_date),
+                    helperText: formik.touched.marriage_date && formik.errors.marriage_date,
+                  },
+                }}
+              />
+            )}
+          </Stack>
 
-        <TextField
-          label="Jummuiya (Small Christian Community)"
-          name="jummuiya"
-          value={formik.values.jummuiya}
-          onChange={formik.handleChange}
-          disabled={loading}
-        />
-
-        {/* Form Actions */}
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Button 
-            variant="outlined" 
-            onClick={() => navigate('/members')}
+          {/* Parish & Jummuiya */}
+          <TextField
+            select
+            label="Parish *"
+            name="parish"
+            value={formik.values.parish}
+            onChange={formik.handleChange}
+            error={formik.touched.parish && Boolean(formik.errors.parish)}
+            helperText={formik.touched.parish && formik.errors.parish}
             disabled={loading}
           >
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            variant="contained" 
-            color="primary"
+            {['St. Mary', 'Sacred Heart', 'Our Lady of Guadalupe'].map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Jummuiya (Small Christian Community)"
+            name="jummuiya"
+            value={formik.values.jummuiya}
+            onChange={formik.handleChange}
             disabled={loading}
-            startIcon={loading ? <CircularProgress size={20} /> : null}
-          >
-            {isEdit ? 'Update' : 'Save'} Member
-          </Button>
+          />
+
+          {/* Form Actions */}
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button 
+              variant="outlined" 
+              onClick={() => navigate('/members')}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              variant="contained" 
+              color="primary"
+              disabled={loading}
+              startIcon={loading ? <CircularProgress size={20} /> : null}
+            >
+              {isEdit ? 'Update' : 'Save'} Member
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </Box>
+      </Box>
+    </LocalizationProvider>
   );
 }

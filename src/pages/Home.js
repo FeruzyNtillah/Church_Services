@@ -1,172 +1,317 @@
 import React, { useState } from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
-import { tokens } from '../theme';
+import { 
+  Grid, 
+  Card, 
+  CardContent, 
+  Typography, 
+  Box, 
+  useTheme,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  useMediaQuery
+} from '@mui/material';
+import { 
+  People as FamilyIcon,
+  Man as MaleIcon,
+  Woman as FemaleIcon,
+  ChildCare as ChildIcon,
+  // eslint-disable-next-line no-unused-vars
+  Event as EventIcon,
+  VolumeUp as AnnouncementIcon,
+  // eslint-disable-next-line no-unused-vars
+  AttachMoney as DonationIcon,
+  CalendarToday as CalendarIcon,
+  TrendingUp as GrowthIcon,
+  Church,
+  KeyboardArrowDown
+} from '@mui/icons-material';
+// eslint-disable-next-line no-unused-vars
 import StatBox from '../components/StatBox';
-import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
-import ManIcon from '@mui/icons-material/Man';
-import WomanIcon from '@mui/icons-material/Woman';
-import ChildCareIcon from '@mui/icons-material/ChildCare';
-import EventIcon from '@mui/icons-material/Event';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ProgressCircle from '../components/ProgressCircle';
+
+// Sample data
+const parishes = [
+  { id: 1, name: "St. Mary's Cathedral" },
+  { id: 2, name: "Sacred Heart Parish" },
+  { id: 3, name: "Our Lady of Guadalupe" }
+];
 
 const Home = () => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [selectedParish, setSelectedParish] = useState(parishes[0].id);
 
-  const [memberStats] = useState({
-    total: 542,
-    male: 210,
-    female: 280,
-    children: 52,
-    totalGrowth: "+12%",
-    maleGrowth: "+8%",
-    femaleGrowth: "+15%",
-    childrenGrowth: "+5%"
-  });
+  const handleParishChange = (event) => {
+    setSelectedParish(event.target.value);
+  };
 
-  const [upcomingEvents] = useState([
-    { id: 1, title: "Sunday Service", date: "2023-06-25", time: "10:00 AM" },
-    { id: 2, title: "Bible Study", date: "2023-06-28", time: "7:00 PM" },
-    { id: 3, title: "Youth Fellowship", date: "2023-07-01", time: "4:00 PM" }
-  ]);
+  // Stats data
+  const stats = [
+    { title: 'Total Members', value: '1,250', icon: <FamilyIcon />, color: 'primary' },
+    { title: 'Male Members', value: '210', icon: <MaleIcon />, color: 'secondary' },
+    { title: 'Female Members', value: '280', icon: <FemaleIcon />, color: 'info' },
+    { title: 'Children', value: '52', icon: <ChildIcon />, color: 'success' },
+  ];
 
-  const calculateProgress = (value, total) => {
-    if (total === 0) return 0;
-    return Math.min(Math.max(value / total, 0), 1);
+  const activities = {
+    announcements: [
+      "Next baptism ceremony - July 15th",
+      "Guest speaker this Sunday - Pastor John",
+      "Building fund collection ongoing"
+    ],
+    events: [
+      { id: 1, title: "Sunday Service", date: "2023-06-25", time: "10:00 AM" },
+      { id: 2, title: "Bible Study", date: "2023-06-28", time: "7:00 PM" },
+      { id: 3, title: "Youth Fellowship", date: "2023-07-01", time: "4:00 PM" }
+    ],
+    metrics: [
+      { title: "Attendance", value: 82, description: "Weekly Average" },
+      { title: "Giving", value: 65, description: "Monthly Target" },
+      { title: "Volunteering", value: 45, description: "Participation" }
+    ]
+  };
+
+  // Format date utility
+  const formatDate = (dateString) => {
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   return (
-    <Box m="20px">
-      {/* GRID SECTION */}
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
-        {/* ROW 1: MEMBER STATISTICS */}
-        {[
-          { value: memberStats.total, label: "Total Members", icon: <FamilyRestroomIcon />, growth: memberStats.totalGrowth },
-          { value: memberStats.male, label: "Male Members", icon: <ManIcon />, growth: memberStats.maleGrowth },
-          { value: memberStats.female, label: "Female Members", icon: <WomanIcon />, growth: memberStats.femaleGrowth },
-          { value: memberStats.children, label: "Children", icon: <ChildCareIcon />, growth: memberStats.childrenGrowth },
-        ].map((stat, index) => (
-          <Box
-            key={index}
-            gridColumn="span 3"
-            backgroundColor={colors.primary[700]}
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-          >
-            <StatBox
-              title={stat.value.toLocaleString()}
-              subtitle={stat.label}
-              progress={calculateProgress(stat.value, memberStats.total)}
-              increase={stat.growth}
-              icon={
-                React.cloneElement(stat.icon, {
-                  sx: { color: colors.blueAccent[600], fontSize: "26px" }
-                })
+    <Box sx={{ 
+      flexGrow: 1, 
+      p: isMobile ? 2 : 3, 
+      backgroundColor: theme.palette.background.default 
+    }}>
+      {/* Header with Parish Selector */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        justifyContent: 'space-between', 
+        alignItems: isMobile ? 'flex-start' : 'center',
+        gap: isMobile ? 2 : 0,
+        mb: 4
+      }}>
+        <Typography 
+          variant="h4" 
+          sx={{ 
+            fontWeight: 700,
+            color: theme.palette.primary.dark
+          }}
+        >
+          Parish Dashboard
+        </Typography>
+        
+        <FormControl sx={{ minWidth: 220 }}>
+          <InputLabel id="parish-select-label">Select Parish</InputLabel>
+          <Select
+            labelId="parish-select-label"
+            value={selectedParish}
+            onChange={handleParishChange}
+            label="Select Parish"
+            IconComponent={KeyboardArrowDown}
+            sx={{
+              borderRadius: 2,
+              bgcolor: 'background.paper',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: theme.palette.primary.light
               }
-            />
-          </Box>
-        ))}
-
-        {/* ROW 2: UPCOMING EVENTS */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[700]}
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600" mb="20px" color={colors.grey[100]}>
-            Church Announcements
-          </Typography>
-          <Box display="flex" flexDirection="column" gap="15px">
-            {[
-              { icon: <EventIcon />, text: "Next baptism ceremony - July 15th" },
-              { icon: <VolumeUpIcon />, text: "Guest speaker this Sunday - Pastor John" },
-              { icon: <AttachMoneyIcon />, text: "Building fund collection ongoing" },
-            ].map((item, index) => (
-              <Box key={index} display="flex" alignItems="center" gap="10px">
-                {React.cloneElement(item.icon, { sx: { color: colors.blueAccent[700] } })}
-                <Typography color={colors.grey[100]}>{item.text}</Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
-
-        {/* Upcoming Events List */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[700]}
-          overflow="auto"
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            borderBottom={`4px solid ${colors.primary[500]}`}
-            p="15px"
+            }}
           >
-            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Upcoming Events
-            </Typography>
-            <EventIcon sx={{ color: colors.grey[100] }} />
-          </Box>
-          
-          {upcomingEvents.map((event) => (
+            {parishes.map((parish) => (
+              <MenuItem key={parish.id} value={parish.id}>
+                {parish.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Stats Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {stats.map((stat, index) => (
+          <Grid item xs={12} sm={6} md={3} key={index}>
+            <Card sx={{ 
+              borderLeft: `4px solid ${theme.palette[stat.color].main}`,
+              boxShadow: theme.shadows[2],
+              transition: 'transform 0.2s',
+              '&:hover': { transform: 'scale(1.02)' }
+            }}>
+              <CardContent>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Typography 
+                      variant="subtitle2" 
+                      color="text.secondary"
+                      sx={{ textTransform: 'uppercase' }}
+                    >
+                      {stat.title}
+                    </Typography>
+                    <Typography 
+                      variant="h4" 
+                      sx={{ 
+                        fontWeight: 700,
+                        color: theme.palette[stat.color].dark
+                      }}
+                    >
+                      {stat.value}
+                    </Typography>
+                  </div>
+                  <Box sx={{
+                    p: 1.5,
+                    borderRadius: '50%',
+                    bgcolor: `${theme.palette[stat.color].light}20`,
+                    color: theme.palette[stat.color].main
+                  }}>
+                    {stat.icon}
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Parish-Specific Content */}
+      <Typography variant="h6" sx={{ 
+        mb: 2,
+        color: theme.palette.primary.main,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1
+      }}>
+        <Church fontSize="small" />
+        {parishes.find(p => p.id === selectedParish)?.name} Activities
+      </Typography>
+
+      {/* Main Content Grid */}
+      <Grid container spacing={3}>
+        {/* Announcements Section */}
+        <Grid item xs={12} md={8}>
+          <Card sx={{ 
+            height: '100%',
+            boxShadow: theme.shadows[2],
+            borderRadius: '8px'
+          }}>
+            <CardContent>
+              <Typography variant="h5" fontWeight="600" mb="20px" color="text.primary">
+                <AnnouncementIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Church Announcements
+              </Typography>
+              
+              <Box display="flex" flexDirection="column" gap="15px">
+                {activities.announcements.map((text, index) => (
+                  <Box key={index} display="flex" alignItems="center" gap="10px">
+                    <AnnouncementIcon sx={{ color: 'secondary.main' }} />
+                    <Typography>{text}</Typography>
+                  </Box>
+                ))}
+              </Box>
+
+              <Box mt="30px">
+                <Typography variant="h5" fontWeight="600" mb="20px" color="text.primary">
+                  <GrowthIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Monthly Growth
+                </Typography>
+                <Box display="flex" justifyContent="space-around" flexWrap="wrap" gap={2}>
+                  {activities.metrics.map((metric, index) => (
+                    <Card key={index} sx={{ 
+                      minWidth: 120, 
+                      p: 2,
+                      textAlign: 'center',
+                      boxShadow: theme.shadows[1]
+                    }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {metric.title}
+                      </Typography>
+                      <Typography variant="h6">
+                        {metric.value}%
+                      </Typography>
+                    </Card>
+                  ))}
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Events Section */}
+        <Grid item xs={12} md={4}>
+          <Card sx={{ 
+            boxShadow: theme.shadows[2],
+            borderRadius: '8px'
+          }}>
             <Box
-              key={event.id}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-              borderBottom={`4px solid ${colors.primary[500]}`}
+              bgcolor="primary.light"
               p="15px"
+              borderBottom={`2px solid ${theme.palette.primary.main}`}
             >
-              <Box>
-                <Typography color={colors.blueAccent[500]} fontWeight="600">
-                  {event.title}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  {new Date(event.date).toLocaleDateString()}
+              <Typography variant="h5" fontWeight="600">
+                <CalendarIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                Upcoming Events
+              </Typography>
+            </Box>
+            
+            <Box>
+              {activities.events.map((event) => (
+                <Box
+                  key={event.id}
+                  p="15px"
+                  borderBottom={`1px solid ${theme.palette.divider}`}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: 'action.hover',
+                      cursor: 'pointer'
+                    }
+                  }}
+                >
+                  <Typography color="primary.main" fontWeight="600">
+                    {event.title}
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" mt="5px">
+                    <Typography variant="body2" color="text.secondary">
+                      {formatDate(event.date)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {event.time}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          </Card>
+        </Grid>
+
+        {/* Progress Metrics */}
+        {activities.metrics.map((metric, index) => (
+          <Grid item xs={12} sm={4} key={index}>
+            <Card sx={{ 
+              p: 3,
+              boxShadow: theme.shadows[1],
+              borderRadius: '8px'
+            }}>
+              <Typography variant="h5" fontWeight="600" mb={2}>
+                {metric.title} Progress
+              </Typography>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                <ProgressCircle size={100} progress={metric.value / 100} />
+                <Typography variant="h6" color="primary" mt={2}>
+                  {metric.value}% {metric.description}
                 </Typography>
               </Box>
-              <Typography color={colors.grey[100]}>{event.time}</Typography>
-            </Box>
-          ))}
-        </Box>
-
-        {/* ROW 3: PROGRESS CIRCLES */}
-        {[
-          { title: "Attendance Progress", progress: 0.82, description: "82% Weekly Average", subtext: "Current month attendance" },
-          { title: "Giving Summary", progress: 0.65, description: "65% Monthly Target", subtext: "Current giving progress" },
-          { title: "Volunteering", progress: 0.45, description: "45% Participation", subtext: "Members actively volunteering" },
-        ].map((item, index) => (
-          <Box
-            key={index}
-            gridColumn="span 4"
-            gridRow="span 2"
-            backgroundColor={colors.primary[700]}
-            p="30px"
-          >
-            <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-              {item.title}
-            </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-              <ProgressCircle size="125" progress={item.progress} />
-              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-                {item.description}
-              </Typography>
-              <Typography color={colors.grey[100]}>{item.subtext}</Typography>
-            </Box>
-          </Box>
+            </Card>
+          </Grid>
         ))}
-      </Box>
+      </Grid>
     </Box>
   );
 };

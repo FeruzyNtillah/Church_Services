@@ -28,7 +28,7 @@ const Sidebar = () => {
     { icon: <Event />, text: "Events", path: "/events" },
     { icon: <LibraryBooks />, text: "Sermons", path: "/sermons" },
     { icon: <AttachMoney />, text: "Donations", path: "/donations" },
-    { icon: <People />, text: "Add Members", path: "/add-members" },
+    { icon: <People />, text: "Add Members", path: "/Addmembers" },
     { icon: <People />, text: "Members", path: "/members" },
   ];
 
