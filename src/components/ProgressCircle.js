@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material';
 const ProgressCircle = ({ 
   progress = 0.75, 
   size = 40,
-  color = "#1976D2",
+  color = "#355F5F",
   backgroundColor = "#E3F2FD"
 }) => {
   const radius = size / 2;

@@ -2,13 +2,13 @@ import { createTheme } from "@mui/material/styles";
 
 export const tokens = (mode = "light") => ({
   primary: {
-    400: "#1976D2", // Primary blue
-    500: "#3B82F6", // Darker blue
-    700: "#6A7FDB", // Darkest blue
+    400: "#355F5F", // Darkest Teal
+    500: "#4A7E73", // Darker Teal
+    700: "#5F9E9E", // Primary Teal
   },
   blueAccent: {
-    500: "#2196F3", // Light blue
-    600: "#1E88E5", // Medium blue
+    500: "#355F5F", // Darkest Teal
+    600: "#4A7E73", // Darker Teal
   },
   grey: {
     100: "#FFFFFF", // White
