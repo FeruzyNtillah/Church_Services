@@ -40,7 +40,7 @@ const Sidebar = () => {
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          color: theme.palette.primary.main,
+          color: '#5F9E9E', // Primary muted teal
           fontWeight: 'bold'
         }}>
           <Dashboard />
@@ -65,17 +65,21 @@ const Sidebar = () => {
               mx: 1,
               borderRadius: 1,
               '&:hover': {
-                backgroundColor: theme.palette.action.hover,
+                backgroundColor: '#F5F5F5', // Light grey hover
+                color: '#355F5F', // Dark teal text on hover
+                '& .MuiListItemIcon-root': {
+                  color: '#355F5F', // Dark teal icon on hover
+                }
               },
               '&.Mui-selected': {
-                backgroundColor: theme.palette.action.selected,
-                color: theme.palette.primary.main,
+                backgroundColor: '#E0F2F1', // Very light teal selected bg
+                color: '#355F5F', // Dark teal text when selected
                 '& .MuiListItemIcon-root': {
-                  color: theme.palette.primary.main,
+                  color: '#355F5F', // Dark teal icon when selected
                 }
               },
               '&.Mui-selected:hover': {
-                backgroundColor: theme.palette.action.selected,
+                backgroundColor: '#E0F2F1', // Keep light teal on hover
               }
             }}
           >
