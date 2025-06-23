@@ -4,7 +4,7 @@ export const tokens = (mode = "light") => ({
   primary: {
     400: "#1976D2", // Primary blue
     500: "#3B82F6", // Darker blue
-    700: "#0D47A1", // Darkest blue
+    700: "#6A7FDB", // Darkest blue
   },
   blueAccent: {
     500: "#2196F3", // Light blue
