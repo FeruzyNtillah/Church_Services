@@ -40,7 +40,7 @@ const Sidebar = () => {
           display: 'flex',
           alignItems: 'center',
           gap: 1,
-          color: '#5F9E9E', // Primary muted teal
+          color: theme.palette.primary.main,
           fontWeight: 'bold'
         }}>
           <Dashboard />
@@ -64,29 +64,30 @@ const Sidebar = () => {
               my: 0.5,
               mx: 1,
               borderRadius: 1,
+              color: theme.palette.primary.main,
+              '& .MuiListItemIcon-root': {
+                color: theme.palette.primary.main,
+              },
               '&:hover': {
-                backgroundColor: '#F5F5F5', // Light grey hover
-                color: '#355F5F', // Dark teal text on hover
+                backgroundColor: theme.palette.action.hover,
+                color: theme.palette.primary.dark,
                 '& .MuiListItemIcon-root': {
-                  color: '#355F5F', // Dark teal icon on hover
+                  color: theme.palette.primary.dark,
                 }
               },
               '&.Mui-selected': {
-                backgroundColor: '#E0F2F1', // Very light teal selected bg
-                color: '#355F5F', // Dark teal text when selected
+                backgroundColor: theme.palette.action.selected,
+                color: theme.palette.primary.dark,
                 '& .MuiListItemIcon-root': {
-                  color: '#355F5F', // Dark teal icon when selected
+                  color: theme.palette.primary.dark,
                 }
               },
               '&.Mui-selected:hover': {
-                backgroundColor: '#E0F2F1', // Keep light teal on hover
+                backgroundColor: theme.palette.action.selected,
               }
             }}
           >
-            <ListItemIcon sx={{ 
-              minWidth: 40,
-              color: theme.palette.text.secondary
-            }}>
+            <ListItemIcon sx={{ minWidth: 40 }}>
               {item.icon}
             </ListItemIcon>
             <ListItemText 
