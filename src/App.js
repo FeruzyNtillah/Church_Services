@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CssBaseline, Container, Box } from '@mui/material';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import theme from './theme'; // Make sure this path is correct to your theme.js file
+import theme from './theme.js'; 
 
 import { AuthProvider } from './auth/AuthProvider';
 import ProtectedRoute from './auth/ProtectedRoute';
