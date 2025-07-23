@@ -33,7 +33,12 @@ const Sidebar = () => {
   ];
 
   return (
-    <Box sx={{ pb: 2 }}>
+    <Box sx={{ 
+      pb: 2,
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       {/* Sidebar Header */}
       <Box sx={{ p: 3, pb: 1 }}>
         <Typography variant="h6" sx={{ 
@@ -50,7 +55,21 @@ const Sidebar = () => {
       <Divider />
 
       {/* Menu Items */}
-      <List sx={{ py: 0 }}>
+      <List sx={{ 
+        py: 0,
+        flex: 1,
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: '0.4em',
+        },
+        '&::-webkit-scrollbar-track': {
+          backgroundColor: theme.palette.background.paper,
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: theme.palette.primary.main,
+          borderRadius: 2,
+        },
+      }}>
         {menuItems.map((item) => (
           <ListItem 
             button 

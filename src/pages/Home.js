@@ -17,21 +17,14 @@ import {
   Man as MaleIcon,
   Woman as FemaleIcon,
   ChildCare as ChildIcon,
-  // eslint-disable-next-line no-unused-vars
-  Event as EventIcon,
   VolumeUp as AnnouncementIcon,
-  // eslint-disable-next-line no-unused-vars
-  AttachMoney as DonationIcon,
   CalendarToday as CalendarIcon,
   TrendingUp as GrowthIcon,
   Church,
   KeyboardArrowDown
 } from '@mui/icons-material';
-// eslint-disable-next-line no-unused-vars
-import StatBox from '../components/StatBox';
 import ProgressCircle from '../components/ProgressCircle';
 
-// Sample data
 const parishes = [
   { id: 1, name: "Parokia ya Bikira Maria Mama wa Rozari Takatifu - Makongo Juu" },
   { id: 2, name: "Parokia ya Mt. Petro - Oysterbay" },
@@ -45,7 +38,6 @@ const parishes = [
   { id: 10, name: "Parokia ya Mt. Petro - Chuo Kikuu (St. Augustine)" }
 ];
 
-
 const Home = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -55,7 +47,6 @@ const Home = () => {
     setSelectedParish(event.target.value);
   };
 
-  // Stats data
   const stats = [
     { title: 'Total Members', value: '1,250', icon: <FamilyIcon />, color: 'primary' },
     { title: 'Male Members', value: '210', icon: <MaleIcon />, color: 'secondary' },
@@ -81,7 +72,6 @@ const Home = () => {
     ]
   };
 
-  // Format date utility
   const formatDate = (dateString) => {
     const options = { weekday: 'short', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -89,9 +79,11 @@ const Home = () => {
 
   return (
     <Box sx={{ 
-      flexGrow: 1, 
-      p: isMobile ? 2 : 3, 
-      backgroundColor: theme.palette.background.default 
+      flexGrow: 1,
+      p: isMobile ? 2 : 3,
+      backgroundColor: theme.palette.background.default,
+      height: '100%',
+      overflow: 'auto'
     }}>
       {/* Header with Parish Selector */}
       <Box sx={{ 
