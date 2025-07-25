@@ -9,7 +9,10 @@ import {
   Switch,
   Alert,
   CircularProgress,
-  Box
+  Box,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -19,69 +22,59 @@ import * as yup from 'yup';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../supabase';
 
-// Validation schema
-const validationSchema = yup.object({
+// Validation schema for family
+const familyValidationSchema = yup.object({
+  family_name: yup.string().required('Family name is required'),
+  parish: yup.string().required('Parish is required'),
+  jummuiya: yup.string(),
+});
+
+// Validation schema for member
+const memberValidationSchema = yup.object({
   first_name: yup.string().required('First name is required'),
-  middle_name: yup.string(),
   last_name: yup.string().required('Last name is required'),
   date_of_birth: yup.date().required('DOB is required'),
+  relation: yup.string().required('Relation to family is required'),
   baptism_date: yup.date().nullable(),
-  communion_date: yup.date().nullable(),
-  confirmation_date: yup.date().nullable(),
+  is_married: yup.boolean(),
   marriage_date: yup.date().when('is_married', {
     is: true,
     then: yup.date().required('Marriage date is required'),
   }),
-  parish: yup.string().required('Parish is required'),
-  jummuiya: yup.string(),
-  is_married: yup.boolean(),
 });
 
-export default function MemberForm() {
+export default function FamilyMemberForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [families, setFamilies] = useState([]);
+  const [mode, setMode] = useState('family'); // 'family' or 'member'
 
-  const formik = useFormik({
+  // Formik for family form
+  const familyFormik = useFormik({
     initialValues: {
-      first_name: '',
-      middle_name: '',
-      last_name: '',
-      date_of_birth: null,
-      baptism_date: null,
-      communion_date: null,
-      confirmation_date: null,
-      marriage_date: null,
-      is_married: false,
+      family_name: '',
       parish: '',
       jummuiya: '',
     },
-    validationSchema,
+    validationSchema: familyValidationSchema,
     onSubmit: async (values) => {
       try {
         setLoading(true);
         setError(null);
 
-        // Format dates for Supabase
-        const formatDate = (date) => date ? date.toISOString() : null;
-        const payload = {
-          ...values,
-          date_of_birth: formatDate(values.date_of_birth),
-          baptism_date: formatDate(values.baptism_date),
-          communion_date: formatDate(values.communion_date),
-          confirmation_date: formatDate(values.confirmation_date),
-          marriage_date: values.is_married ? formatDate(values.marriage_date) : null,
-        };
-
-        // Supabase operation
-        const { error } = isEdit
-          ? await supabase.from('members').update(payload).eq('id', id)
-          : await supabase.from('members').insert([payload]);
+        const { data, error } = await supabase
+          .from('families')
+          .insert([values])
+          .select();
 
         if (error) throw error;
-        navigate('/members');
+        
+        setFamilies([...families, data[0]]);
+        familyFormik.resetForm();
+        setMode('member');
       } catch (err) {
         setError(err.message);
       } finally {
@@ -90,30 +83,79 @@ export default function MemberForm() {
     },
   });
 
-  // Load data for editing
-  useEffect(() => {
-    if (!isEdit) return;
-
-    const fetchMember = async () => {
+  // Formik for member form
+  const memberFormik = useFormik({
+    initialValues: {
+      family_id: '',
+      first_name: '',
+      last_name: '',
+      date_of_birth: null,
+      relation: 'Head',
+      baptism_date: null,
+      is_married: false,
+      marriage_date: null,
+    },
+    validationSchema: memberValidationSchema,
+    onSubmit: async (values) => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('members')
-          .select('*')
-          .eq('id', id)
-          .single();
+        setError(null);
+
+        const formatDate = (date) => date ? date.toISOString() : null;
+        const payload = {
+          ...values,
+          date_of_birth: formatDate(values.date_of_birth),
+          baptism_date: formatDate(values.baptism_date),
+          marriage_date: values.is_married ? formatDate(values.marriage_date) : null,
+        };
+
+        const { error } = isEdit
+          ? await supabase.from('members').update(payload).eq('id', id)
+          : await supabase.from('members').insert([payload]);
 
         if (error) throw error;
+        navigate('/families');
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    },
+  });
 
-        formik.setValues({
-          ...data,
-          date_of_birth: data.date_of_birth ? new Date(data.date_of_birth) : null,
-          baptism_date: data.baptism_date ? new Date(data.baptism_date) : null,
-          communion_date: data.communion_date ? new Date(data.communion_date) : null,
-          confirmation_date: data.confirmation_date ? new Date(data.confirmation_date) : null,
-          marriage_date: data.marriage_date ? new Date(data.marriage_date) : null,
-          is_married: !!data.marriage_date,
-        });
+  // Load families and member data (for edit)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch families
+        const { data: familiesData, error: familiesError } = await supabase
+          .from('families')
+          .select('*');
+        
+        if (familiesError) throw familiesError;
+        setFamilies(familiesData);
+
+        // If editing, fetch member data
+        if (isEdit) {
+          const { data: memberData, error: memberError } = await supabase
+            .from('members')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+          if (memberError) throw memberError;
+
+          memberFormik.setValues({
+            ...memberData,
+            date_of_birth: memberData.date_of_birth ? new Date(memberData.date_of_birth) : null,
+            baptism_date: memberData.baptism_date ? new Date(memberData.baptism_date) : null,
+            marriage_date: memberData.marriage_date ? new Date(memberData.marriage_date) : null,
+            is_married: !!memberData.marriage_date,
+          });
+          setMode('member');
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -121,14 +163,14 @@ export default function MemberForm() {
       }
     };
 
-    fetchMember();
-  }, [formik, id, isEdit]);
+    fetchData();
+  }, [id, isEdit, memberFormik]); // Added memberFormik to dependencies
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box component="form" onSubmit={formik.handleSubmit} sx={{ p: 3 }}>
+      <Box sx={{ p: 3 }}>
         <Typography variant="h5" gutterBottom>
-          {isEdit ? 'Edit Member' : 'Add New Member'}
+          {mode === 'family' ? 'Add New Family' : isEdit ? 'Edit Family Member' : 'Add Family Member'}
         </Typography>
         <Divider sx={{ mb: 3 }} />
 
@@ -138,151 +180,208 @@ export default function MemberForm() {
           </Alert>
         )}
 
-        <Stack spacing={3}>
-          {/* Name Section */}
-          <Typography variant="subtitle1">Personal Information</Typography>
-          <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
-            <TextField
-              fullWidth
-              label="First Name *"
-              name="first_name"
-              value={formik.values.first_name}
-              onChange={formik.handleChange}
-              error={formik.touched.first_name && Boolean(formik.errors.first_name)}
-              helperText={formik.touched.first_name && formik.errors.first_name}
-              disabled={loading}
-            />
-            <TextField
-              fullWidth
-              label="Middle Name"
-              name="middle_name"
-              value={formik.values.middle_name}
-              onChange={formik.handleChange}
-              disabled={loading}
-            />
-            <TextField
-              fullWidth
-              label="Last Name *"
-              name="last_name"
-              value={formik.values.last_name}
-              onChange={formik.handleChange}
-              error={formik.touched.last_name && Boolean(formik.errors.last_name)}
-              helperText={formik.touched.last_name && formik.errors.last_name}
-              disabled={loading}
-            />
-          </Stack>
-
-          {/* Date Fields */}
-          <DatePicker
-            label="Date of Birth *"
-            value={formik.values.date_of_birth}
-            onChange={(date) => formik.setFieldValue('date_of_birth', date)}
-            disabled={loading}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                error: formik.touched.date_of_birth && Boolean(formik.errors.date_of_birth),
-                helperText: formik.touched.date_of_birth && formik.errors.date_of_birth,
-              },
-            }}
-          />
-
-          <Typography variant="subtitle1">Sacramental Records</Typography>
-          <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
-            <DatePicker
-              label="Baptism Date"
-              value={formik.values.baptism_date}
-              onChange={(date) => formik.setFieldValue('baptism_date', date)}
-              disabled={loading}
-              sx={{ minWidth: 200 }}
-            />
-            <DatePicker
-              label="First Communion"
-              value={formik.values.communion_date}
-              onChange={(date) => formik.setFieldValue('communion_date', date)}
-              disabled={loading}
-              sx={{ minWidth: 200 }}
-            />
-            <DatePicker
-              label="Confirmation"
-              value={formik.values.confirmation_date}
-              onChange={(date) => formik.setFieldValue('confirmation_date', date)}
-              disabled={loading}
-              sx={{ minWidth: 200 }}
-            />
-          </Stack>
-
-          {/* Marriage Field */}
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Typography>Married:</Typography>
-            <Switch
-              checked={formik.values.is_married}
-              onChange={(e) => formik.setFieldValue('is_married', e.target.checked)}
-              disabled={loading}
-            />
-            {formik.values.is_married && (
-              <DatePicker
-                label="Marriage Date *"
-                value={formik.values.marriage_date}
-                onChange={(date) => formik.setFieldValue('marriage_date', date)}
+        {mode === 'family' ? (
+          // Family Form
+          <Box component="form" onSubmit={familyFormik.handleSubmit}>
+            <Stack spacing={3}>
+              <TextField
+                fullWidth
+                label="Family Name *"
+                name="family_name"
+                value={familyFormik.values.family_name}
+                onChange={familyFormik.handleChange}
+                error={familyFormik.touched.family_name && Boolean(familyFormik.errors.family_name)}
+                helperText={familyFormik.touched.family_name && familyFormik.errors.family_name}
                 disabled={loading}
-                sx={{ minWidth: 200 }}
-                slotProps={{
-                  textField: {
-                    error: formik.touched.marriage_date && Boolean(formik.errors.marriage_date),
-                    helperText: formik.touched.marriage_date && formik.errors.marriage_date,
-                  },
-                }}
               />
-            )}
-          </Stack>
 
-          {/* Parish & Jummuiya */}
-          <TextField
-            select
-            label="Parish *"
-            name="parish"
-            value={formik.values.parish}
-            onChange={formik.handleChange}
-            error={formik.touched.parish && Boolean(formik.errors.parish)}
-            helperText={formik.touched.parish && formik.errors.parish}
-            disabled={loading}
-          >
-            {['St. Mary', 'Sacred Heart', 'Our Lady of Guadalupe'].map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
+              <TextField
+                select
+                label="Parish *"
+                name="parish"
+                value={familyFormik.values.parish}
+                onChange={familyFormik.handleChange}
+                error={familyFormik.touched.parish && Boolean(familyFormik.errors.parish)}
+                helperText={familyFormik.touched.parish && familyFormik.errors.parish}
+                disabled={loading}
+              >
+                {['St. Mary', 'Sacred Heart', 'Our Lady of Guadalupe'].map((option) => (
+                  <MenuItem key={option} value={option}>
+                    {option}
+                  </MenuItem>
+                ))}
+              </TextField>
 
-          <TextField
-            label="Jummuiya (Small Christian Community)"
-            name="jummuiya"
-            value={formik.values.jummuiya}
-            onChange={formik.handleChange}
-            disabled={loading}
-          />
+              <TextField
+                label="Jummuiya (Small Christian Community)"
+                name="jummuiya"
+                value={familyFormik.values.jummuiya}
+                onChange={familyFormik.handleChange}
+                disabled={loading}
+              />
 
-          {/* Form Actions */}
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button 
-              variant="outlined" 
-              onClick={() => navigate('/members')}
-              disabled={loading}
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              variant="contained" 
-              color="primary"
-              disabled={loading}
-              startIcon={loading ? <CircularProgress size={20} /> : null}
-            >
-              {isEdit ? 'Update' : 'Save'} Member
-            </Button>
-          </Stack>
-        </Stack>
+              <Stack direction="row" spacing={2} justifyContent="flex-end">
+                <Button 
+                  variant="outlined" 
+                  onClick={() => navigate('/families')}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="contained" 
+                  color="primary"
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : null}
+                >
+                  Save Family
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        ) : (
+          // Member Form
+          <Box component="form" onSubmit={memberFormik.handleSubmit}>
+            <Stack spacing={3}>
+              <FormControl fullWidth>
+                <InputLabel id="family-select-label">Family *</InputLabel>
+                <Select
+                  labelId="family-select-label"
+                  id="family_id"
+                  name="family_id"
+                  value={memberFormik.values.family_id}
+                  onChange={memberFormik.handleChange}
+                  label="Family *"
+                  disabled={loading || isEdit}
+                >
+                  {families.map((family) => (
+                    <MenuItem key={family.id} value={family.id}>
+                      {family.family_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+                <TextField
+                  fullWidth
+                  label="First Name *"
+                  name="first_name"
+                  value={memberFormik.values.first_name}
+                  onChange={memberFormik.handleChange}
+                  error={memberFormik.touched.first_name && Boolean(memberFormik.errors.first_name)}
+                  helperText={memberFormik.touched.first_name && memberFormik.errors.first_name}
+                  disabled={loading}
+                />
+                <TextField
+                  fullWidth
+                  label="Last Name *"
+                  name="last_name"
+                  value={memberFormik.values.last_name}
+                  onChange={memberFormik.handleChange}
+                  error={memberFormik.touched.last_name && Boolean(memberFormik.errors.last_name)}
+                  helperText={memberFormik.touched.last_name && memberFormik.errors.last_name}
+                  disabled={loading}
+                />
+              </Stack>
+
+              <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+                <DatePicker
+                  label="Date of Birth *"
+                  value={memberFormik.values.date_of_birth}
+                  onChange={(date) => memberFormik.setFieldValue('date_of_birth', date)}
+                  disabled={loading}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: memberFormik.touched.date_of_birth && Boolean(memberFormik.errors.date_of_birth),
+                      helperText: memberFormik.touched.date_of_birth && memberFormik.errors.date_of_birth,
+                    },
+                  }}
+                />
+                <TextField
+                  select
+                  fullWidth
+                  label="Relation to Family *"
+                  name="relation"
+                  value={memberFormik.values.relation}
+                  onChange={memberFormik.handleChange}
+                  error={memberFormik.touched.relation && Boolean(memberFormik.errors.relation)}
+                  helperText={memberFormik.touched.relation && memberFormik.errors.relation}
+                  disabled={loading}
+                >
+                  {['Head', 'Spouse', 'Child', 'Other'].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Stack>
+
+              <Typography variant="subtitle1">Sacramental Records</Typography>
+              <Stack direction="row" spacing={2} useFlexGap flexWrap="wrap">
+                <DatePicker
+                  label="Baptism Date"
+                  value={memberFormik.values.baptism_date}
+                  onChange={(date) => memberFormik.setFieldValue('baptism_date', date)}
+                  disabled={loading}
+                  sx={{ minWidth: 200 }}
+                />
+              </Stack>
+
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Typography>Married:</Typography>
+                <Switch
+                  checked={memberFormik.values.is_married}
+                  onChange={(e) => memberFormik.setFieldValue('is_married', e.target.checked)}
+                  disabled={loading}
+                />
+                {memberFormik.values.is_married && (
+                  <DatePicker
+                    label="Marriage Date *"
+                    value={memberFormik.values.marriage_date}
+                    onChange={(date) => memberFormik.setFieldValue('marriage_date', date)}
+                    disabled={loading}
+                    sx={{ minWidth: 200 }}
+                    slotProps={{
+                      textField: {
+                        error: memberFormik.touched.marriage_date && Boolean(memberFormik.errors.marriage_date),
+                        helperText: memberFormik.touched.marriage_date && memberFormik.errors.marriage_date,
+                      },
+                    }}
+                  />
+                )}
+              </Stack>
+
+              <Stack direction="row" spacing={2} justifyContent="flex-end">
+                <Button 
+                  variant="outlined" 
+                  onClick={() => setMode('family')}
+                  disabled={loading}
+                >
+                  Back to Family
+                </Button>
+                <Button 
+                  variant="outlined" 
+                  onClick={() => navigate('/families')}
+                  disabled={loading}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="contained" 
+                  color="primary"
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : null}
+                >
+                  {isEdit ? 'Update' : 'Save'} Member
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        )}
       </Box>
     </LocalizationProvider>
   );
